@@ -1,0 +1,564 @@
+{
+  "name": "Cold Email(With SMTP Node)",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        208
+      ],
+      "id": "bc57ba5e-e3cc-4c69-a084-6b14ccc7ce9a",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1SGtrJY8EctR9dw6t1oL1JLKykyaj7BVEGpfPIxqV0bE",
+          "mode": "list",
+          "cachedResultName": "cold email agent",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SGtrJY8EctR9dw6t1oL1JLKykyaj7BVEGpfPIxqV0bE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SGtrJY8EctR9dw6t1oL1JLKykyaj7BVEGpfPIxqV0bE/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -352,
+        208
+      ],
+      "id": "588e2f77-af59-418a-85eb-2670aa3f94fe",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "eVWCv4ITNIP3rvVC",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fdc40194-662b-402b-b731-6405ce91259e",
+              "leftValue": "={{ $json[\"Send Status\"] }}",
+              "rightValue": "SENT",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        208
+      ],
+      "id": "e7d87531-0ac4-4403-b024-c5fb07b44da8",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        96,
+        192
+      ],
+      "id": "f81bb06e-fb24-471b-9c80-42a80b790fc9",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1SGtrJY8EctR9dw6t1oL1JLKykyaj7BVEGpfPIxqV0bE",
+          "mode": "list",
+          "cachedResultName": "cold email agent",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SGtrJY8EctR9dw6t1oL1JLKykyaj7BVEGpfPIxqV0bE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SGtrJY8EctR9dw6t1oL1JLKykyaj7BVEGpfPIxqV0bE/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        320,
+        16
+      ],
+      "id": "6504a910-5a62-467f-b178-f21352c7da00",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "eVWCv4ITNIP3rvVC",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const templates = items.map(i => i.json);\n\nif (!templates.length) {\n  throw new Error(\"No templates found\");\n}\n\nconst t = templates[Math.floor(Math.random() * templates.length)];\n\n// If Body is missing → fallback\nconst bodyText = t.Body || t.body || t.MESSAGE || t.Template || \"\";\n\nconst bodyHTML = bodyText\n  ? bodyText.replace(/\\n/g, '<br>')\n  : \"<p>No template body found</p>\";\n\nreturn [\n  {\n    json: {\n      subject: t.Subject || t.subject || \"No Subject\",\n      body: bodyHTML\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        544,
+        16
+      ],
+      "id": "5cd55a97-c01a-447c-a7a8-98fab8c6bceb",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        768,
+        96
+      ],
+      "id": "85f54e4f-bddc-41e6-9dc7-6d96a53c76ae",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f6a6ba02-422b-4e7c-a73e-03901cc2db0c",
+              "name": "body",
+              "value": "={{ $json.body.replace(\"[name]\", $json[\"Name\"] && $json[\"Name\"].trim() !== '' ? $json[\"Name\"].trim() : \"there\") }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        976,
+        96
+      ],
+      "id": "d8a6dab1-0935-41c1-bced-aa5648a92909",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "={{ $json.subject }}",
+        "message": "=Hello This is from SITAR COLLEGE,  \n\nAre you thinking about building a future in Engineering or Agriculture?  \nAt SITAR, we help students turn their passion into a strong career path.\n\nWhat you get:  \n• Practical learning  \n• Live projects  \n• Career counseling  \n• Placement support  \n• Skill certifications  \n\nReply to this email if you’d like a counselor to guide you personally.\n\nWarm regards,  \nCareer Guidance Cell  \n[SITAR].\n",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "Sampoorna Institute of Technology "
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1200,
+        176
+      ],
+      "id": "213b528c-438a-4861-b6b1-4ffba92c6459",
+      "name": "Gmail",
+      "webhookId": "3fbf6bf1-efca-44a5-8ed0-8e0fb1d4143f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "tCuwOOHAZDZS0iFg",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1424,
+        32
+      ],
+      "id": "690724d3-897f-4ea1-ac82-d13c0b2f7f9b",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1SGtrJY8EctR9dw6t1oL1JLKykyaj7BVEGpfPIxqV0bE",
+          "mode": "list",
+          "cachedResultName": "cold email agent",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SGtrJY8EctR9dw6t1oL1JLKykyaj7BVEGpfPIxqV0bE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1966761260,
+          "mode": "list",
+          "cachedResultName": "Sheet3",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SGtrJY8EctR9dw6t1oL1JLKykyaj7BVEGpfPIxqV0bE/edit#gid=1966761260"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "subject",
+              "displayName": "subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "body",
+              "displayName": "body",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Send Status",
+              "displayName": "Send Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Time",
+              "displayName": "Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "threadId",
+              "displayName": "threadId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "labelIds",
+              "displayName": "labelIds",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1648,
+        32
+      ],
+      "id": "815477d6-396d-45a3-87a4-c11c859109a7",
+      "name": "Google Sheets2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "eVWCv4ITNIP3rvVC",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1424,
+        288
+      ],
+      "id": "a5fa3949-05f0-482b-a49f-4a5d3126e17e",
+      "name": "Wait",
+      "webhookId": "59d0e464-9eef-4147-9d07-e283193ed822"
+    },
+    {
+      "parameters": {
+        "content": "   ## Get Leads Data From Google Sheet",
+        "height": 320,
+        "width": 380
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -384,
+        96
+      ],
+      "typeVersion": 1,
+      "id": "ed47b317-93df-428d-ba79-f2893938f4e4",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Get Email Templates From Google Sheet\n",
+        "height": 300,
+        "width": 388
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        288,
+        -112
+      ],
+      "typeVersion": 1,
+      "id": "52f70054-1398-4257-94e5-6fdafe5586f4",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Log The Status",
+        "height": 280,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1568,
+        -48
+      ],
+      "typeVersion": 1,
+      "id": "6368b906-8838-4a5b-b6b5-1c293eef264f",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7a3cb1e8-a041-470c-aeb6-2862a43ead3f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ee0aaf5013f48d78b0640e36a5b14740584d70b1e1dc49710c8e8e4b897d6465"
+  },
+  "id": "rjDd2yDQuEPaKMfc",
+  "tags": []
+}
